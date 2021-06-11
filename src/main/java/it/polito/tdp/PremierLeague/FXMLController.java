@@ -48,6 +48,17 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	
+    	Match m = cmbMatch.getValue();
+    	
+    	if(m == null || m.toString() == "") {
+    		txtResult.appendText("Selezionare Match");
+    		return;
+    	}
+    	
+    	model.creaGrafo(m);
+    	
+    	txtResult.appendText(model.crazioneGrafo());
+    	
     }
 
     @FXML
@@ -72,6 +83,10 @@ public class FXMLController {
     }
     
     public void setModel(Model model) {
+    	
     	this.model = model;
+    	
+    	cmbMatch.getItems().addAll(model.getMatches());
+    	
     }
 }

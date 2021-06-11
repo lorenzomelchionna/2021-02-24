@@ -98,7 +98,7 @@ public class Match {
 
 	@Override
 	public String toString() {
-		return "[" + matchID + "] " + teamHomeNAME + " vs. " + teamAwayNAME;
+		return "Match" + matchID + ": " + teamHomeNAME + " vs. " + teamAwayNAME;
 	}
 
 	@Override
