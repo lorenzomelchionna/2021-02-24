@@ -39,32 +39,58 @@ public class Model {
 		
 		Graphs.addAllVertices(grafo, dao.getPlayersByMatch(m, idMap));
 		
-		Map<Player,Float> mapEff = dao.getEfficienze(m, idMap);
-		
-		for(Player p : idMap.values()) {
+		for(Adiacenza a : dao.getAdiacenze(m, idMap)) {
 			
-			for(Player pp : idMap.values()) {
-				
-				if(!p.equals(pp) && grafo.vertexSet().contains(p) && grafo.vertexSet().contains(pp) && !grafo.containsEdge(p, pp)) {
-				
-					if(mapEff.keySet().contains(p) && mapEff.keySet().contains(pp)) {
-					
-						float weight = mapEff.get(p)-mapEff.get(pp);
-						
-						if(weight>0) {
-							Graphs.addEdgeWithVertices(grafo, p, pp, weight);
-						}
-					
-					}
-				
+			if(a.getPeso() > 0) {
+				if(grafo.containsVertex(a.getP1()) && grafo.containsVertex(a.getP2())) {
+					Graphs.addEdgeWithVertices(this.grafo, a.getP1(), a.getP2(), a.getPeso());
 				}
-				
+			} else {
+				if(grafo.containsVertex(a.getP1()) && grafo.containsVertex(a.getP2())) {
+					Graphs.addEdgeWithVertices(this.grafo, a.getP2(), a.getP1(), (-1)*a.getPeso());
+				}
 			}
 			
 		}
 		
 	}
 
+	public GiocatoreMigliore getMigliore() {
+		
+		if(grafo == null) {
+			return null;
+		}
+		
+		Player migliore = null;
+		Double maxDelta = (double) Integer.MIN_VALUE;
+		
+		for(Player p : grafo.vertexSet()) {
+			
+			double pesoUscente = 0.0;
+			
+			for(DefaultWeightedEdge e : this.grafo.outgoingEdgesOf(p)) {
+				pesoUscente += this.grafo.getEdgeWeight(e);
+			}
+			
+			double pesoEntrante = 0.0;
+			
+			for(DefaultWeightedEdge e : this.grafo.incomingEdgesOf(p)) {
+				pesoEntrante += this.grafo.getEdgeWeight(e);
+			}
+			
+			double delta = pesoUscente-pesoEntrante;
+			
+			if(delta > maxDelta) {
+				migliore = p;
+				maxDelta = delta;
+			}
+			
+		}
+		
+		return new GiocatoreMigliore(migliore,maxDelta);
+		
+	}
+	
 	public List<Match> getMatches() {
 		return matches;
 	}

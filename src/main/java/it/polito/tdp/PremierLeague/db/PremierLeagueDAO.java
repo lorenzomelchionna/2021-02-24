@@ -5,11 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import it.polito.tdp.PremierLeague.model.Action;
+import it.polito.tdp.PremierLeague.model.Adiacenza;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 import it.polito.tdp.PremierLeague.model.Team;
@@ -139,19 +139,13 @@ public class PremierLeagueDAO {
 		}
 	}
 	
-	public Map<Player,Float> getEfficienze(Match m, Map<Integer,Player> idMap){
+	public List<Adiacenza> getAdiacenze(Match m, Map<Integer,Player> idMap){
 		
-		String sql = "SELECT PlayerID AS id, totalSuccessfulPassesAll AS passaggi, assists AS assist, timePlayed AS time "
+		String sql = "SELECT a1.PlayerID AS id1, a2.PlayerID AS id2, ((a1.totalSuccessfulPassesAll+a1.assists)/a1.timePlayed)-((a2.TotalSuccessfulPassesAll+a2.assists)/a2.timePlayed) AS w "
 				+ "FROM actions a1, actions a2 "
-				+ "WHERE MatchID = ? AND timePlayed > 0";
+				+ "WHERE a1.MatchID = ? AND a1.MatchID = a2.MatchID AND a1.PlayerID > a2.PlayerID AND a1.TeamID != a2.TeamID ";
 		
-		/*SELECT a1.PlayerID AS id1, a2.PlayerID AS id2, ((a1.totalSuccessfulPassesAll+a1.assists)/a1.timePlayed)-((a2.TotalSuccessfulPassesAll+a2.assists)/a2.timePlayed) AS w
-		FROM actions a1, actions a2
-		WHERE a1.MatchID = 1 AND a1.MatchID = a2.MatchID AND a1.PlayerID != a2.PlayerID
-		GROUP BY a1.PlayerID, a2.PlayerID
-		HAVING w > 0 */
-		
-		Map<Player,Float> result = new HashMap<>();
+		List<Adiacenza> result = new ArrayList<>();
 		
 		Connection conn = DBConnect.getConnection();
 
@@ -162,10 +156,9 @@ public class PremierLeagueDAO {
 			
 			while (res.next()) {
 
-				float e = (float)(res.getInt("passaggi")+res.getInt("assist"))/(float)res.getInt("time");
-				
-				if(e>0)
-					result.put(idMap.get(res.getInt("id")), e);
+				if(idMap.containsKey(res.getInt("id1")) && idMap.containsKey(res.getInt("id2"))) {
+					result.add(new Adiacenza(idMap.get(res.getInt("id1")), idMap.get(res.getInt("id2")), res.getDouble("w")));
+				}
 
 			}
 			conn.close();

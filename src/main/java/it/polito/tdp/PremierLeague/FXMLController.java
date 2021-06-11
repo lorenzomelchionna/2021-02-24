@@ -51,7 +51,7 @@ public class FXMLController {
     	Match m = cmbMatch.getValue();
     	
     	if(m == null || m.toString() == "") {
-    		txtResult.appendText("Selezionare Match");
+    		txtResult.appendText("Selezionare Match!\n");
     		return;
     	}
     	
@@ -62,7 +62,9 @@ public class FXMLController {
     }
 
     @FXML
-    void doGiocatoreMigliore(ActionEvent event) {    	
+    void doGiocatoreMigliore(ActionEvent event) {   
+    	
+    	txtResult.appendText("Giocatore migliore: "+this.model.getMigliore());
     	
     }
     
