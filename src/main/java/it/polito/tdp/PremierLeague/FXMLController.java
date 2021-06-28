@@ -70,6 +70,17 @@ public class FXMLController {
     
     @FXML
     void doSimula(ActionEvent event) {
+    	
+    	int N;
+    	
+    	try {
+    		N = Integer.parseInt(txtN.getText());
+    	}catch(NumberFormatException nfe) {
+    		txtResult.appendText("Formato N non corretto!\n");
+    		return;
+    	}
+    	
+    	txtResult.appendText(model.simula(N));
 
     }
 

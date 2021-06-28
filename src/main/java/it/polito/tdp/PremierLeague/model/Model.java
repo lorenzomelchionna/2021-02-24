@@ -21,6 +21,8 @@ public class Model {
 	
 	private List<Match> matches;
 	
+	private Match match;
+	
 	public Model() {
 		
 		this.dao = new PremierLeagueDAO();
@@ -34,6 +36,8 @@ public class Model {
 	}
 	
 	public void creaGrafo(Match m) {
+		
+		this.match = m;
 		
 		grafo = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
 		
@@ -98,6 +102,30 @@ public class Model {
 	public String crazioneGrafo() {
 		
 		return "#Vertici: "+grafo.vertexSet().size()+"\n#Archi: "+grafo.edgeSet().size()+"\n";
+		
+	}
+	
+	public String getTeamFtomPlayer(Match m, Player p) {
+		
+		return dao.getTeamFromPlayer(p, m);
+		
+	}
+	
+	public String simula(int N) {
+		
+		Simulator sim = new Simulator(this);
+		
+		sim.init(this.match, N);
+		
+		sim.run();
+		
+		String result = this.match+"\n";
+		
+		result += "Result: "+sim.getGoalCasa()+" - "+sim.getGoalTrasferta()+"\n";
+		
+		result += "Expelled: "+sim.getRossiCasa()+" - "+sim.getRossiTrasferta()+"\n";
+		
+		return result;
 		
 	}
 	
